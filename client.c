@@ -58,7 +58,7 @@ int main(int argc, char const *argv[])
     strtok(message, "\n");
 
     // Send message
-    char *message_encrypted = encrypt(message, server_public_key);
+    char *message_encrypted = rsa_encrypt(message, server_public_key);
     send(sock, message_encrypted, strlen(message_encrypted), 0);
     printf("Client message: %s\n", message);
     printf("Client message (encrypted): %s\n", message_encrypted);
@@ -66,7 +66,7 @@ int main(int argc, char const *argv[])
     // Receive response from server
     valread = read(sock, buffer, 1024);
     printf("\nServer message: %s\n", buffer);
-    printf("Server message (decrypted): %s\n", decrypt(buffer, key_pair.private));
+    printf("Server message (decrypted): %s\n", rsa_decrypt(buffer, key_pair.private));
 
     free(server_public_key);
     return 0;

@@ -126,7 +126,7 @@ struct RSAKeys generate_key_pair()
     return key_pair;
 }
 
-char *encrypt(char *message, char *public_key)
+char *rsa_encrypt(char *message, char *public_key)
 {
     // Get numbers
     struct RSAKeyTokens tokens = get_tokens(public_key);
@@ -152,7 +152,7 @@ char *encrypt(char *message, char *public_key)
     //printf("\n");
     return encrypted_message;
 }
-char *decrypt(char *message, char *private_key)
+char *rsa_decrypt(char *message, char *private_key)
 {
     // Get numbers
     struct RSAKeyTokens tokens = get_tokens(private_key);

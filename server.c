@@ -58,13 +58,13 @@ int main(int argc, char const *argv[])
 
     // Receive message
     valread = read(new_socket, buffer, 1024);
-    char *decrypted_message = decrypt(buffer, key_pair.private);
+    char *decrypted_message = rsa_decrypt(buffer, key_pair.private);
     printf("\nClient message: %s\n", buffer);
     printf("Client message (decrypted): %s\n", decrypted_message);
 
     // Send response message
     char *message = "hello from server";
-    char *message_encrypted = encrypt(message, client_public_key);
+    char *message_encrypted = rsa_encrypt(message, client_public_key);
     send(new_socket, message_encrypted, strlen(message_encrypted), 0);
     printf("\nServer message: %s\n", message);
     printf("Server message (encrypted): %s\n", message_encrypted);

@@ -21,8 +21,8 @@ struct RSAKeyTokens
     int n;
 };
 struct RSAKeyTokens get_tokens(char *key);
-char *encrypt(char *message, char *public_key);
-char *decrypt(char *message, char *private_key);
+char *rsa_encrypt(char *message, char *public_key);
+char *rsa_decrypt(char *message, char *private_key);
 int is_prime(int num);
 struct RSAKeys generate_key_pair();
 int generate_prime_number();
