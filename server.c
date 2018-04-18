@@ -7,10 +7,7 @@ int main(int argc, char const *argv[])
     int opt = 1;
     int addrlen = sizeof(address);
     char buffer[1024] = {0};
-    char *hello = "Hello from server";
-
-    printf("Server running in port %i\n", PORT);
-
+    system("clear");
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
@@ -28,8 +25,7 @@ int main(int argc, char const *argv[])
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(PORT);
     // Forcefully attaching socket to the port 8080
-    if (bind(server_fd, (struct sockaddr *)&address,
-             sizeof(address)) < 0)
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
     {
         perror("bind failed");
         exit(EXIT_FAILURE);
@@ -39,15 +35,40 @@ int main(int argc, char const *argv[])
         perror("listen");
         exit(EXIT_FAILURE);
     }
-    if ((new_socket = accept(server_fd, (struct sockaddr *)&address,
-                             (socklen_t *)&addrlen)) < 0)
+    printf("Server running in port %i\n", PORT);
+    // Generate public and private keys
+    struct RSAKeys key_pair = generate_key_pair();
+    printf("\nPublic key: %s\nPrivate key: %s\n", key_pair.public, key_pair.private);
+    if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen)) < 0)
     {
         perror("accept");
         exit(EXIT_FAILURE);
     }
+
+    // Receive the client public key
     valread = read(new_socket, buffer, 1024);
-    printf("%s\n", buffer);
-    send(new_socket, hello, strlen(hello), 0);
-    printf("Message sent: %s\n", hello);
+    char *client_public_key = malloc(strlen(buffer) + 1);
+    strcpy(client_public_key, buffer);
+    memset(buffer, 0, sizeof buffer);
+    printf("Client public key: %s\n", client_public_key);
+
+    // Send public key
+    send(new_socket, key_pair.public, strlen(key_pair.public), 0);
+    printf("Public key sent!\n");
+
+    // Receive message
+    valread = read(new_socket, buffer, 1024);
+    char *decrypted_message = decrypt(buffer, key_pair.private);
+    printf("\nClient message: %s\n", buffer);
+    printf("Client message (decrypted): %s\n", decrypted_message);
+
+    // Send response message
+    char *message = "hello from server";
+    char *message_encrypted = encrypt(message, client_public_key);
+    send(new_socket, message_encrypted, strlen(message_encrypted), 0);
+    printf("\nServer message: %s\n", message);
+    printf("Server message (encrypted): %s\n", message_encrypted);
+
+    free(client_public_key);
     return 0;
 }
